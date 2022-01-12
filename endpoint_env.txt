@@ -1,0 +1,40 @@
+10.0.0.0 / 22
+
+public
+10.0.0.0 / 24	-	Public-1-SB
+10.0.1.0 / 24	-	Public-2-SB
+
+private
+10.0.2.0 / 24
+10.0.3.0 / 24
+
+VPC  10.0.0.0 / 22
+SB (chk availability zone)
+internet gateway (Test-Internet-Gateway) -> VPC conn
+NAT Gateway(Test-NAT-Gateway) at Public-1-SB(10.0.0.0/24)  Elastic IP allocate
+RT (Public-1-RT, Public-2-RT, ~ ) -> SB conn
+	Public
+	local(10.0.0.0/22) , 0.0.0.0/0 Internet Gateway
+	Private
+	local(10.0.0.0/22), 0.0.0.0/0 NAT Gateway(at Public-1-SB)
+4 EC2 AL
+	public - public ip allocate / http allow(80), ssh(22, my ip)
+	private - user data
+
+endpoint
+Test-Endpoint-Service(Network)
+
+
+
+
+
+user data	
+
+#!/bin/bash
+(
+echo "qwe123"
+echo "qwe123"
+) | passwd --stdin root
+sed -i "s/^PasswordAuthentication no/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+sed -i "s/^#PermitRootLogin yes/PermitRootLogin yes/g" /etc/ssh/sshd_config
+service sshd restart
